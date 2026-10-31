@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Master | HTML, CSS & JavaScript</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">Q</div>
+        <div>
+          <h1>Quiz Master</h1>
+          <p>Learn it. Test it. Master it.</p>
+        </div>
+      </div>
+      <div class="pill">HTML <span style="color:var(--cyan)">•</span> CSS <span style="color:var(--purple)">•</span>
+        JavaScript</div>
+    </header>
+
+    <section id="setupScreen">
+      <div class="hero">
+        <div class="eyebrow">Your daily coding challenge</div>
+        <h2>Knowledge is your<br>superpower.</h2>
+        <p>Choose a category, beat the clock, and see how much you really know.</p>
+      </div>
+      <div class="panel">
+        <div class="section-heading">
+          <div>
+            <h3>Choose your category</h3>
+            <p>Pick one subject to begin your challenge.</p>
+          </div>
+        </div>
+        <div class="categories">
+          <button class="category selected" data-category="HTML"><span
+              class="cat-icon">🏗️</span><strong>HTML</strong><small>Structure & semantic tags</small></button>
+          <button class="category" data-category="CSS"><span class="cat-icon">🎨</span><strong>CSS</strong><small>Styles
+              & layouts</small></button>
+          <button class="category" data-category="JavaScript"><span
+              class="cat-icon">⚡</span><strong>JavaScript</strong><small>Logic & interactivity</small></button>
+          <button class="category" data-category="Mixed"><span class="cat-icon">🧠</span><strong>Mixed
+              Quiz</strong><small>All three subjects</small></button>
+        </div>
+        <div class="settings">
+          <div>
+            <div class="setting-label">Time per question</div>
+            <div class="setting-options" id="timeOptions"><button data-time="10">10 sec</button><button data-time="15"
+                class="active">15 sec</button><button data-time="30">30 sec</button></div>
+          </div>
+          <div>
+            <div class="setting-label">Questions per round</div>
+            <div class="setting-options" id="countOptions"><button data-count="5" class="active">5</button><button
+                data-count="10">10</button><button data-count="15">15</button></div>
+          </div>
+        </div>
+        <div class="start-row"><button class="primary" id="startBtn">Start quiz <span
+              aria-hidden="true">→</span></button></div>
+      </div>
+    </section>
+
+    <section id="quizScreen" class="hidden">
+      <div class="panel">
+        <div class="quiz-layout">
+          <div class="quiz-main">
+            <div class="quiz-top"><span class="category-tag" id="categoryTag">HTML CHALLENGE</span><span class="counter"
+                id="counter">Question 1 of 5</span></div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <h2 class="question" id="questionText"></h2>
+            <div class="answers" id="answers"></div>
+            <div class="feedback" id="feedback" aria-live="polite"></div>
+            <div class="quiz-actions"><button class="secondary" id="resetBtn">↻ Reset quiz</button>
+              <div class="action-right"><button class="secondary" id="skipBtn">Skip</button><button class="primary"
+                  id="nextBtn" disabled>Next question →</button></div>
+            </div>
+          </div>
+          <aside class="sidebar">
+            <div class="stat">
+              <div class="stat-label">Time left</div>
+              <div class="timer-ring" id="timerRing"><span class="timer-number" id="timerNumber">15</span></div>
+              <div class="timer-caption">seconds</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Your score</div>
+              <div class="stat-value" id="scoreValue">0</div>
+              <div class="timer-caption" style="text-align:left">points earned</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Answered</div>
+              <div class="stat-value" id="answeredValue">0/5</div>
+              <div class="timer-caption" style="text-align:left">questions completed</div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="hidden">
+      <div class="panel result">
+        <div class="result-icon" id="resultIcon">🏆</div>
+        <div class="eyebrow">Challenge complete</div>
+        <h2 id="resultTitle">Well played!</h2>
+        <p id="resultMessage"></p>
+        <div class="score-circle">
+          <div><strong id="finalScore">0</strong><span>out of <span id="maxScore">500</span> points</span></div>
+        </div>
+        <div class="result-stats">
+          <div><strong id="correctCount">0</strong><span>Correct</span></div>
+          <div><strong id="wrongCount">0</strong><span>Incorrect / skipped</span></div>
+          <div><strong id="accuracy">0%</strong><span>Accuracy</span></div>
+        </div>
+        <div class="start-row" style="justify-content:center;flex-wrap:wrap"><button class="secondary"
+            id="changeCategoryBtn">Choose category</button><button class="primary" id="playAgainBtn">Play again
+            ↻</button></div>
+      </div>
+    </section>
+    <p class="footer">Built with HTML, CSS & JavaScript · Keep learning, one question at a time.</p>
+  </div>
+   <script src="main.js"></script>
+</body>
+
+</html>
