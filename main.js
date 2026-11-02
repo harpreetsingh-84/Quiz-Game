@@ -127,3 +127,138 @@
     $("resetBtn").addEventListener("click", resetQuiz);
     $("playAgainBtn").addEventListener("click", startQuiz);
     $("changeCategoryBtn").addEventListener("click", () => { stopTimer(); resultScreen.classList.add("hidden"); quizScreen.classList.add("hidden"); setupScreen.classList.remove("hidden"); });
+
+/* ===== Learning enhancements: difficulty, practice mode, and saved progress ===== */
+(function () {
+  const HISTORY_KEY = "quizMasterLearningHistory";
+  let selectedDifficulty = "Beginner";
+  let selectedMode = "challenge";
+
+  function readHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); }
+    catch (_) { return []; }
+  }
+  function saveHistory(items) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(-20))); }
+    catch (_) { /* App still works if browser storage is unavailable. */ }
+  }
+  function updateDashboard() {
+    const history = readHistory();
+    const attempts = document.getElementById("historyAttempts");
+    const accuracy = document.getElementById("historyAccuracy");
+    const best = document.getElementById("historyBest");
+    const weak = document.getElementById("weakTopicMessage");
+    const list = document.getElementById("historyList");
+    if (!attempts || !accuracy || !best || !weak || !list) return;
+
+    attempts.textContent = history.length;
+    const avg = history.length ? Math.round(history.reduce((sum, item) => sum + item.accuracy, 0) / history.length) : 0;
+    accuracy.textContent = avg + "%";
+    best.textContent = history.length ? Math.max(...history.map(item => item.score)) : 0;
+
+    if (!history.length) {
+      weak.textContent = "Complete a quiz to discover which subject you should practise next.";
+    } else {
+      const byCategory = {};
+      history.forEach(item => {
+        if (!byCategory[item.category]) byCategory[item.category] = { total: 0, count: 0 };
+        byCategory[item.category].total += item.accuracy;
+        byCategory[item.category].count++;
+      });
+      const weakest = Object.entries(byCategory).sort((a, b) =>
+        (a[1].total / a[1].count) - (b[1].total / b[1].count)
+      )[0];
+      const weakAccuracy = Math.round(weakest[1].total / weakest[1].count);
+      weak.textContent = weakAccuracy < 80
+        ? `Practice recommendation: focus on ${weakest[0]} (average accuracy ${weakAccuracy}%).`
+        : `Great progress! Your lowest recent subject is ${weakest[0]} (${weakAccuracy}%). Keep practising to reach 100%.`;
+    }
+
+    list.innerHTML = "";
+    history.slice(-4).reverse().forEach(item => {
+      const chip = document.createElement("span");
+      chip.className = "history-chip";
+      chip.textContent = `${item.category} · ${item.accuracy}% · ${item.date}`;
+      list.appendChild(chip);
+    });
+  }
+
+  document.querySelectorAll("#difficultyOptions button").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedDifficulty = button.dataset.difficulty;
+      document.querySelectorAll("#difficultyOptions button").forEach(b => b.classList.toggle("active", b === button));
+    });
+  });
+  document.querySelectorAll("#modeOptions button").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedMode = button.dataset.mode;
+      document.querySelectorAll("#modeOptions button").forEach(b => b.classList.toggle("active", b === button));
+    });
+  });
+
+  const clearButton = document.getElementById("clearHistoryBtn");
+  if (clearButton) clearButton.addEventListener("click", () => {
+    saveHistory([]);
+    updateDashboard();
+  });
+
+  // Use the existing question bank and quiz flow; difficulty selects a slice of the bank.
+  const originalStartQuiz = startQuiz;
+  startQuiz = function () {
+    state._learningDifficulty = selectedDifficulty;
+    state._learningMode = selectedMode;
+    // Each subject currently has 15 questions: split them into three 5-question levels.
+    const originalBank = {};
+    Object.keys(questionBank).forEach(category => {
+      originalBank[category] = questionBank[category];
+      const level = selectedDifficulty === "Beginner" ? 0 : selectedDifficulty === "Intermediate" ? 1 : 2;
+      questionBank[category] = originalBank[category].slice(level * 5, level * 5 + 5);
+    });
+    originalStartQuiz();
+    // Restore the full bank so changing levels never permanently removes questions.
+    Object.keys(originalBank).forEach(category => { questionBank[category] = originalBank[category]; });
+  };
+
+  // Wrap rendering to show the selected level and support untimed practice.
+  const originalRenderQuestion = renderQuestion;
+  renderQuestion = function () {
+    if (state._learningMode === "practice") state.time = 999999;
+    else state.time = Number(document.querySelector("#timeOptions button.active")?.dataset.time || 15);
+    originalRenderQuestion();
+    const tag = document.getElementById("categoryTag");
+    if (tag) tag.textContent += ` · ${state._learningDifficulty.toUpperCase()}${state._learningMode === "practice" ? " · PRACTICE" : ""}`;
+  };
+
+  const originalStartTimer = startTimer;
+  startTimer = function () {
+    if (state._learningMode === "practice") {
+      stopTimer();
+      state.remaining = 0;
+      const timerNumber = document.getElementById("timerNumber");
+      if (timerNumber) timerNumber.textContent = "∞";
+      const ring = document.getElementById("timerRing");
+      if (ring) ring.style.background = "conic-gradient(var(--green) 360deg,#ffffff13 0)";
+      return;
+    }
+    originalStartTimer();
+  };
+
+  // Persist a compact result record after the existing result screen is rendered.
+  const originalFinishQuiz = finishQuiz;
+  finishQuiz = function () {
+    originalFinishQuiz();
+    const history = readHistory();
+    const total = state.questions.length || 1;
+    history.push({
+      category: state.category,
+      difficulty: state._learningDifficulty || "Beginner",
+      score: state.score,
+      accuracy: Math.round((state.correct / total) * 100),
+      date: new Date().toLocaleDateString()
+    });
+    saveHistory(history);
+    updateDashboard();
+  };
+
+  updateDashboard();
+})();
