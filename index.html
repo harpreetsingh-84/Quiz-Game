@@ -28,6 +28,20 @@
         <h2>Knowledge is your<br>superpower.</h2>
         <p>Choose a category, beat the clock, and see how much you really know.</p>
       </div>
+
+      <div class="learning-dashboard" id="learningDashboard">
+        <div class="dashboard-heading">
+          <div><span class="eyebrow">Your learning journey</span><h3>Progress dashboard</h3></div>
+          <button class="secondary small-btn" id="clearHistoryBtn" type="button">Clear history</button>
+        </div>
+        <div class="dashboard-stats">
+          <div class="learning-stat"><span>Quizzes completed</span><strong id="historyAttempts">0</strong></div>
+          <div class="learning-stat"><span>Average accuracy</span><strong id="historyAccuracy">0%</strong></div>
+          <div class="learning-stat"><span>Best score</span><strong id="historyBest">0</strong></div>
+        </div>
+        <p class="weak-topic" id="weakTopicMessage">Complete a quiz to discover which subject you should practise next.</p>
+        <div class="history-list" id="historyList"></div>
+      </div>
       <div class="panel">
         <div class="section-heading">
           <div>
@@ -44,6 +58,24 @@
               class="cat-icon">⚡</span><strong>JavaScript</strong><small>Logic & interactivity</small></button>
           <button class="category" data-category="Mixed"><span class="cat-icon">🧠</span><strong>Mixed
               Quiz</strong><small>All three subjects</small></button>
+        </div>
+
+        <div class="extra-settings">
+          <div>
+            <div class="setting-label">Difficulty</div>
+            <div class="setting-options" id="difficultyOptions">
+              <button type="button" data-difficulty="Beginner" class="active">Beginner</button>
+              <button type="button" data-difficulty="Intermediate">Intermediate</button>
+              <button type="button" data-difficulty="Advanced">Advanced</button>
+            </div>
+          </div>
+          <div>
+            <div class="setting-label">Learning mode</div>
+            <div class="setting-options" id="modeOptions">
+              <button type="button" data-mode="challenge" class="active">Timed challenge</button>
+              <button type="button" data-mode="practice">Practice mode</button>
+            </div>
+          </div>
         </div>
         <div class="settings">
           <div>
